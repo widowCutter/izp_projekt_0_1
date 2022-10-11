@@ -70,7 +70,7 @@ struct contact parseContact(FILE *fp)
 struct numberList parseTable(char *path)
 {
     struct numberList numberList;
-    numberList.contList = malloc(sizeof(contact) * 10);
+    numberList.contList = malloc(sizeof(struct contact) * 10);
     numberList.alocLenght = 10;
     numberList.trueLenght = 0;
     for (int i = 0; ; i++) {
