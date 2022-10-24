@@ -9,15 +9,41 @@ struct Contact {
 };
 
 int parse_argument(char *query, int argc, char *argv[]) {
-  if (argc <= 2) {
+  for (int i = 0; argv[1][i] != '\0'; i++) {
+    if (argv[1][i] >= 48 && argv[1][i] <= 57) {
+      query[i] = argv[1][i];
+    }
+  }
+  if (argc < 2) {
     return 1;
   }
   return 0;
 }
+float compare_name(char *query, char *name) { return 0.0; }
+float compare_number(char *query, char *number) { 
+  int hits = 0;
+  for (int i = 0; 1; i++) {
+    if (query[i] == '\0') {
+      return (double)hits/i;
+    }
+    if (number[i] == '\0' && query[i] != '\0') {
+      return 0;
+    }
+    if (number[i] == query[i])
+    {
+      hits++;
+    }
+  }
+return 0.0; }
 
-int compare_inputs(struct Contact contact, char *query) { return 0; }
+int compare_inputs(struct Contact *contact, char *query) { 
+  printf("Comparing Name:[%s] and Number:[%s] with query [%s]\n", contact->name, contact->number, query);
+  float nameAcuracy = compare_name(query, contact->name);
+  float numberAcuracy = compare_number(query, contact->number);
+  printf("nameAcuracy: [%f]numberAcuracy: [%f]", nameAcuracy, numberAcuracy);
+  return 0; }
 
-int read_file() {
+int read_file(char *query) {
   int nextChar;
   // nextChar = getchar();
   bool isIn = false;
@@ -49,6 +75,7 @@ int read_file() {
           buffer[i] = '\0';
           printf("Number:[%s]\n", buffer);
 
+          compare_inputs(&contact, query);
           struct Contact contact;
           buffer = contact.name;
           isIn = false;
@@ -77,5 +104,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Invalid query supplied, check your arguments\n");
     return 1;
   }
-  return read_file();
+  printf("Query:[%s]\n", query);
+  return read_file(query);
 }
