@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef enum { inName, inNumber, blank } isInWord;
 typedef enum { false, true } bool;
@@ -11,7 +12,8 @@ struct Contact {
 
 int parse_argument(char *query, int argc, char *argv[]) {
   if (argc < 2) {
-    return 1;
+    query[0] = '\0';
+    return 0;
   }
   for (int i = 0; argv[1][i] != '\0'; i++) {
     if (argv[1][i] >= 48 && argv[1][i] <= 57) {
@@ -108,12 +110,17 @@ float compare_number(char *query, char *number) {
 }
 
 int compare_inputs(struct Contact *contact, char *query, float neededAccuracy) {
+  if (query[0] == '\0') {
+    printf("%s\n%s\n", contact->name, contact->number);
+    return 1;
+  }
   // printf("Comparing Name:[%s] and Number:[%s] with query [%s]\n",
   // contact->name,contact->number, query);
   float nameAcuracy = compare_name(query, contact->name);
   float numberAcuracy = compare_number(query, contact->number);
-  if (nameAcuracy >= neededAccuracy || numberAcuracy > neededAccuracy) {
+  if (nameAcuracy >= neededAccuracy || numberAcuracy >= neededAccuracy) {
     printf("%s\n%s\n", contact->name, contact->number);
+    return 1;
   }
   // printf("nameAcuracy: [%f]numberAcuracy: [%f]\n", nameAcuracy,
   // numberAcuracy);
@@ -124,9 +131,10 @@ int read_file(char *query) {
   int nextChar = 0;
   isInWord isIn = blank;
   struct Contact contact;
+  bool found = false;
 
   char *buffer = contact.name;
-  
+
   while (nextChar != EOF) {
     for (int i = 0; i < 100; i++) {
 
@@ -148,7 +156,9 @@ int read_file(char *query) {
           buffer[i] = '\0';
           // printf("Number:[%s]\n", buffer);
 
-          compare_inputs(&contact, query, 1);
+          if (compare_inputs(&contact, query, 1) == 1) {
+            found = true;
+          };
           struct Contact contact;
           buffer = contact.name;
           isIn = blank;
@@ -156,6 +166,9 @@ int read_file(char *query) {
           i = -1;
         }
         if (nextChar == EOF) {
+          if (found == false) {
+            printf("Not found\n");
+          }
           return 0;
         }
         continue;
